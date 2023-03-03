@@ -1,0 +1,148 @@
+{% extends 'home/base.html' %} {% block body %}
+<!-- Page Header Start -->
+<div class="container-fluid bg-secondary mb-5">
+  <div
+    class="d-flex flex-column align-items-center justify-content-center"
+    style="min-height: 300px"
+  >
+    <h1 class="font-weight-semi-bold text-uppercase mb-3">My Cart Product</h1>
+    <div class="d-inline-flex">
+      <p class="m-0"><a href="/">Home</a></p>
+      <p class="m-0 px-2">-</p>
+      <p class="m-0">My Cart Product</p>
+    </div>
+  </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Cart Start -->
+<div class="container-fluid pt-5">
+  <div class="row px-xl-5">
+    <div class="col-lg-8 table-responsive mb-5">
+      <table class="table table-bordered text-center mb-0">
+        <thead class="bg-secondary text-dark">
+          <tr>
+            <th>Products</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody class="align-middle">
+          {% for cart in my_cart %}
+          <tr>
+            <td class="align-middle">
+              <img
+                src="{{ cart.product.photo.url }}"
+                alt=""
+                style="width: 50px"
+              />
+              {{ cart.product.name }}
+            </td>
+            <td class="align-middle">{{ cart.product.price }}</td>
+
+            <td class="align-middle">
+              <div class="input-group mx-auto" style="width: 100px">
+                <form
+                  method="post"
+                  action="{% url 'home:add_subtract_cart_item' %}"
+                >
+                  <div class="input-group-btn">
+                    {% csrf_token %}
+                    <input type="hidden" name="asci" value="0" />
+                    <input type="hidden" name="pk" value="{{ cart.pk }}" />
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-primary btn-minus"
+                    >
+                      <i class="fa fa-minus"></i>
+                    </button>
+                  </div>
+                </form>
+                <input
+                  type="text"
+                  class="form-control form-control-sm bg-secondary text-center"
+                  value="{{ cart.quantity }}"
+                  readonly
+                />
+                <form
+                  method="post"
+                  action="{% url 'home:add_subtract_cart_item' %}"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="asci" value="1" />
+                  <input type="hidden" name="pk" value="{{ cart.pk }}" />
+                  <button class="btn btn-sm btn-primary btn-plus">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+            <td class="align-middle">Rs.{{ cart.price }}</td>
+            <td class="align-middle">
+              <form method="post" action="{% url 'home:remove_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{ cart.pk }}" />
+                <button class="btn btn-sm btn-primary">
+                  <i class="fa fa-times"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if not price == 0 %}
+    <div class="col-lg-4">
+      <div class="card border-secondary mb-5">
+        <div class="card-header bg-secondary border-0">
+          <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
+        </div>
+        <form method="post" action="{% url 'home:checkout' %}">
+          {% csrf_token %}
+          <div class="card-footer border-secondary bg-transparent">
+            <div class="d-flex justify-content-between mt-2">
+              <h5 class="font-weight-bold">Grand Total</h5>
+              <h5 class="font-weight-bold">Rs. {{ price }}</h5>
+            </div>
+            Shipping Address:
+            <input
+              type="text"
+              class="form-control"
+              name="shipping_address"
+              required
+            /><br />
+            Payment Method:<br />
+            {% comment %}
+            <input
+              type="radio"
+              id="1"
+              name="payment_method"
+              value="Esewa"
+              required
+            />
+            <label for="1">Esewa</label><br />
+            {% endcomment %}
+            <input
+              type="radio"
+              id="2"
+              name="payment_method"
+              value="Cash On Delivery"
+              required
+            />
+            <label for="2">Cash On Delivery</label><br />
+            <button class="btn btn-block btn-primary my-3 py-3">
+              Proceed To Checkout
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<!-- Cart End -->
+
+{% endblock %}
